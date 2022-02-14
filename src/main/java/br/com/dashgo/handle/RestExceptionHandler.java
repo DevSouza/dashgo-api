@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import br.com.dashgo.exception.BadRequestException;
 import br.com.dashgo.exception.BadRequestExceptionDetails;
 import br.com.dashgo.exception.ExceptionDetails;
+import br.com.dashgo.exception.NotFoundException;
 import br.com.dashgo.exception.ValidationError;
 import br.com.dashgo.exception.ValidationExceptionDetails;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -38,6 +40,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 			.build();
 		
 		return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(NotFoundException.class)
+	public ResponseEntity<ExceptionDetails> handleBadRequestException(NotFoundException e) {
+		ExceptionDetails body = ExceptionDetails.builder()
+			.timestamp(LocalDateTime.now())
+			.title("Not Found Exception, Check the Documentation")
+			.details(e.getMessage())
+			.developerMessage(e.getClass().getName())
+			.build();
+		
+		return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(AccessDeniedException.class)
@@ -63,6 +77,30 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 				.build();
 		
 		return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+	}
+	
+	@ExceptionHandler(value = DataIntegrityViolationException.class)
+	public ResponseEntity<ExceptionDetails> handleBadRequestException(DataIntegrityViolationException e) {
+		ExceptionDetails body = ExceptionDetails.builder()
+			.timestamp(LocalDateTime.now())
+			.title("Data Integrity Violation Exception, Check the Documentation")
+			.details(e.getMessage())
+			.developerMessage(e.getClass().getName())
+			.build();
+		
+		return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@ExceptionHandler(value = Exception.class)
+	public ResponseEntity<ExceptionDetails> handleBadRequestException(Exception e) {
+		ExceptionDetails body = ExceptionDetails.builder()
+			.timestamp(LocalDateTime.now())
+			.title("Exception, Check the Documentation")
+			.details(e.getMessage())
+			.developerMessage(e.getClass().getName())
+			.build();
+		
+		return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@Override

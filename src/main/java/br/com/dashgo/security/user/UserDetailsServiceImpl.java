@@ -24,7 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
     	log.info("Searching in the DB the user by username '{}'", username);
-    	User user = userService.findByUsernameOrThrowBadRequestException(username);
+    	User user = userService.findByUsernameOrThrowNotFoundException(username);
         
         log.info("user found '{}'", user.getUsername());
 

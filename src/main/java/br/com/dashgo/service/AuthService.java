@@ -69,7 +69,7 @@ public class AuthService {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String username = ((CustomUserDetails) authentication.getPrincipal()).getUsername();
 		
-		User user = userService.findByUsernameOrThrowBadRequestException(username);
+		User user = userService.findByUsernameOrThrowNotFoundException(username);
 		
 		return UserGetResponseBody.builder()
 				.username(username)
