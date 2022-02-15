@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -43,7 +45,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(NotFoundException.class)
-	public ResponseEntity<ExceptionDetails> handleBadRequestException(NotFoundException e) {
+	public ResponseEntity<ExceptionDetails> handleNotFoundException(NotFoundException e) {
 		ExceptionDetails body = ExceptionDetails.builder()
 			.timestamp(LocalDateTime.now())
 			.title("Not Found Exception, Check the Documentation")
@@ -67,7 +69,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(ExpiredJwtException.class)
-	public ResponseEntity<BadRequestExceptionDetails> handleBadRequestException(ExpiredJwtException e) {
+	public ResponseEntity<BadRequestExceptionDetails> handleExpiredJwtException(ExpiredJwtException e) {
 		BadRequestExceptionDetails body = BadRequestExceptionDetails.builder()
 				.timestamp(LocalDateTime.now())
 				.title("Bad Request Exception, Check the Documentation")
@@ -79,8 +81,38 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
 	}
 	
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ExceptionDetails> handleBadCredentialsException(BadCredentialsException e) {
+		ExceptionDetails body = ExceptionDetails.builder()
+			.timestamp(LocalDateTime.now())
+			.title("Bad Credentials Exception, Check the Documentation")
+			.details(e.getMessage())
+			.developerMessage(e.getClass().getName())
+			.build();
+		
+		return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+	}
+	
+	
+	
+	@ExceptionHandler(InternalAuthenticationServiceException.class)
+	public ResponseEntity<?> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException e) {
+		if(e.getCause() instanceof NotFoundException) {
+			return handleNotFoundException((NotFoundException) e.getCause());
+		}
+		
+		ExceptionDetails body = ExceptionDetails.builder()
+				.timestamp(LocalDateTime.now())
+				.title("Internal Authentication Service Exception, Check the Documentation")
+				.details(e.getMessage())
+				.developerMessage(e.getClass().getName())
+				.build();
+			
+		return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+	}
+	
 	@ExceptionHandler(value = DataIntegrityViolationException.class)
-	public ResponseEntity<ExceptionDetails> handleBadRequestException(DataIntegrityViolationException e) {
+	public ResponseEntity<?> handleBadRequestException(DataIntegrityViolationException e) {
 		ExceptionDetails body = ExceptionDetails.builder()
 			.timestamp(LocalDateTime.now())
 			.title("Data Integrity Violation Exception, Check the Documentation")

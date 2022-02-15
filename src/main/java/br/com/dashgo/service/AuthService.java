@@ -24,7 +24,7 @@ public class AuthService {
 	@Autowired private JWTUtils jwtUtils;
 	
 	public AuthResponseBody signIn(String username, String password) {
-
+			
 		// Find user.
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 		SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -31,7 +31,7 @@ public class UserService {
 	}
 	
 	public User findByUserIdOrThrowNotFoundException(Long userId) {
-		return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+		return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Usuário não encontrado!"));
 	}
 	
 	public Optional<User> findByUsername(String username) {
@@ -39,7 +39,7 @@ public class UserService {
     }
 	
 	public User findByUsernameOrThrowNotFoundException(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User not found!"));
+        return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado!"));
     }
 
 	public User addUser(@Valid UserPostRequestBody data) {
@@ -49,11 +49,11 @@ public class UserService {
 		Optional<User> userByEmail = userRepository.findByEmail(data.getEmail());
 
 		if(!data.getPassword().equals(data.getPasswordConfirmation()))
-			inner.add(new ValidationError("","confirmPassword", "The password and confirmation password do not match."));
+			inner.add(new ValidationError("","confirmPassword", "Confirmação de senha e a senha, não são iguais."));
 		if(userByUsername.isPresent())
-			inner.add(new ValidationError(data.getUsername(), "username", "Username unavailable."));		
+			inner.add(new ValidationError(data.getUsername(), "username", "Username indisponível."));		
 		if(userByEmail.isPresent())
-			inner.add(new ValidationError(data.getEmail(), "email", "E-mail unavailable."));
+			inner.add(new ValidationError(data.getEmail(), "email", "E-mail indisponível."));
 			
 		if(!inner.isEmpty())
 			throw new BadRequestException("Bad Request Exception, Invalid Fields", inner);
