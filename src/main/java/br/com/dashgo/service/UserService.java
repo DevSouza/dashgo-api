@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.dashgo.exception.BadRequestException;
@@ -58,8 +59,13 @@ public class UserService {
 		if(!inner.isEmpty())
 			throw new BadRequestException("Bad Request Exception, Invalid Fields", inner);
 			
+		
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		data.setPassword(encoder.encode(data.getPassword()));
+		
 		User user = new User();
 		user.setCreatedAt(LocalDateTime.now());
+		
 		BeanUtils.copyProperties(data, user);
 		
 		return userRepository.save(user);
