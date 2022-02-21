@@ -46,8 +46,8 @@ public class UsersController {
     	UserDTO userDTO = new UserDTO();
     	BeanUtils.copyProperties(user, userDTO);
     	
-    	userDTO.setPermissions(user.getPermissions().stream().map(item -> new PermissionDTO(item.getPermissionId(), item.getName(), item.getDescription())).toList());
-    	userDTO.setRoles(user.getRoles().stream().map(item -> new RoleDTO(item.getRoleId(), item.getName(), item.getDescription())).toList());
+    	userDTO.setPermissions(user.getPermissions().stream().map(item -> new PermissionDTO(item.getPermissionId(), item.getName(), item.getDescription())).collect(Collectors.toList()));
+    	userDTO.setRoles(user.getRoles().stream().map(item -> new RoleDTO(item.getRoleId(), item.getName(), item.getDescription())).collect(Collectors.toList()));
         return ResponseEntity.ok(userDTO);
     }
 
