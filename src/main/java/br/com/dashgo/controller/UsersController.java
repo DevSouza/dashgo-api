@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.stream.Collectors;
 import br.com.dashgo.model.User;
 import br.com.dashgo.model.dto.PermissionDTO;
 import br.com.dashgo.model.dto.RoleDTO;
