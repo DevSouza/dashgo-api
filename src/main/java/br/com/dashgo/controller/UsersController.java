@@ -2,6 +2,7 @@ package br.com.dashgo.controller;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -11,12 +12,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.dashgo.model.User;
+import br.com.dashgo.model.dto.PermissionDTO;
+import br.com.dashgo.model.dto.RoleDTO;
+import br.com.dashgo.model.dto.UserDTO;
 import br.com.dashgo.request.UserPostRequestBody;
+import br.com.dashgo.request.UserPutPermissionsRequestBody;
 import br.com.dashgo.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +42,13 @@ public class UsersController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('users.list')")
     public ResponseEntity<?> listUsers(@PathVariable("id") Long userId) {
-        return ResponseEntity.ok(userService.findByUserIdOrThrowNotFoundException(userId));
+    	User user = userService.findByUserIdOrThrowNotFoundException(userId);
+    	UserDTO userDTO = new UserDTO();
+    	BeanUtils.copyProperties(user, userDTO);
+    	
+    	userDTO.setPermissions(user.getPermissions().stream().map(item -> new PermissionDTO(item.getPermissionId(), item.getName(), item.getDescription())).toList());
+    	userDTO.setRoles(user.getRoles().stream().map(item -> new RoleDTO(item.getRoleId(), item.getName(), item.getDescription())).toList());
+        return ResponseEntity.ok(userDTO);
     }
 
     @PostMapping
@@ -46,4 +58,11 @@ public class UsersController {
     	return ResponseEntity.status(HttpStatus.CREATED).body(user);    	
     }
     
+    @PutMapping("/{id}/permissions")
+    @PreAuthorize("hasAuthority('users.update.permissions')")
+    public ResponseEntity<?> putUserPermissions(@PathVariable("id") Long userId, @RequestBody UserPutPermissionsRequestBody body) {
+    	// TODO: Adicionar regra que o userId 1 não pode ser alterado.
+    	userService.updatePermissions(userId, body);    	
+    	return ResponseEntity.noContent().build();
+    }
 }

@@ -30,7 +30,15 @@ public class Role {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer roleId;
 
-	@Column(length = 20)
+	@Column(length = 255)
 	private String name;
+	
+	@Column(length = 255)
+	private String description;
+	
+	public Role(Integer roleId, String name) {
+		this.roleId = roleId;
+		this.name = name;
+	}
 	
 }

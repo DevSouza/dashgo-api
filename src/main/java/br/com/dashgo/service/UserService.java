@@ -16,9 +16,12 @@ import org.springframework.stereotype.Service;
 import br.com.dashgo.exception.BadRequestException;
 import br.com.dashgo.exception.NotFoundException;
 import br.com.dashgo.exception.ValidationError;
+import br.com.dashgo.model.Permission;
+import br.com.dashgo.model.Role;
 import br.com.dashgo.model.User;
 import br.com.dashgo.repository.UserRepository;
 import br.com.dashgo.request.UserPostRequestBody;
+import br.com.dashgo.request.UserPutPermissionsRequestBody;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,6 +29,8 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	
 	private final UserRepository userRepository;
+	private final PermissionsService permissionsService;
+	private final RoleService roleService;
 	
 	public Page<User> findAll(Pageable pageable) {
 		return userRepository.findAll(pageable);
@@ -69,5 +74,23 @@ public class UserService {
 		BeanUtils.copyProperties(data, user);
 		
 		return userRepository.save(user);
+	}
+
+	public void updatePermissions(Long userId, UserPutPermissionsRequestBody body) {
+		User user = this.findByUserIdOrThrowNotFoundException(userId);
+		
+		user.getPermissions().clear();
+		body.getPermissions().forEach(item -> {
+			Permission permission = permissionsService.findByPermissionIdOrThrowNotFoundException(item.getPermissionId());
+			user.getPermissions().add(permission);
+		});
+		
+		user.getRoles().clear();
+		body.getRoles().forEach(item -> {
+			Role role = roleService.findByRoleIdOrThrowNotFoundException(item.getRoleId());
+			user.getRoles().add(role);
+		});
+		
+		userRepository.save(user);
 	}
 }

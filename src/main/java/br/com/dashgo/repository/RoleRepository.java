@@ -9,6 +9,6 @@ import br.com.dashgo.model.Role;
 
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role, Long> {
+public interface RoleRepository extends JpaRepository<Role, Integer> {
   Optional<Role> findByName(String name);
 }

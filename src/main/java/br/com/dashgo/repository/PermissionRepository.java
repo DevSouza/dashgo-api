@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import br.com.dashgo.model.Permission;
 
 @Repository
-public interface PermissionRespository extends JpaRepository<Permission, Integer> {
+public interface PermissionRepository extends JpaRepository<Permission, Integer> {
 }
